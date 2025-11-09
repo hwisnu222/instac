@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fagram
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    volumes:
+      - ./data/downloads:/app/backend/downloads
+    environment:
+      - PYTHONUNBUFFERED=1
+      - FASTAPI_ENV=production

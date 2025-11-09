@@ -1,7 +1,6 @@
 import {
   Container,
   VStack,
-  HStack,
   Heading,
   Text,
   Input,
@@ -9,14 +8,52 @@ import {
   Flex,
   InputGroup,
   Box,
-  Card,
-  Image,
+  Highlight,
+  Tabs,
 } from "@chakra-ui/react";
 import "./App.css";
-import Table from "./components/Table";
-import { Link2, Download, Search, Github } from "lucide-react";
+import {
+  Link2,
+  Download,
+  Github,
+  ListChevronsDownUp,
+  GalleryThumbnails,
+} from "lucide-react";
+import Links from "./components/Links";
+import Gallery from "./components/Gallery";
+import { useState, useTransition, type ChangeEvent } from "react";
+import { API_BASE } from "./config/api";
+import { toaster } from "./components/ui/toaster";
 
 function App() {
+  const [isPending, startTransition] = useTransition();
+  const [url, setUrl] = useState("");
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setUrl(e.target.value);
+  };
+
+  const handleSubmit = () => {
+    try {
+      startTransition(async () => {
+        const res = await API_BASE.post("/download", {
+          url,
+        });
+        console.log(res);
+        toaster.create({
+          description: "Post saved successfully",
+          type: "success",
+        });
+      });
+    } catch (error) {
+      console.log(error);
+      toaster.create({
+        description: "Failed save post",
+        type: "error",
+      });
+    }
+  };
+
   return (
     <Box pb={8}>
       <Flex
@@ -25,19 +62,27 @@ function App() {
         alignItems="center"
         position="sticky"
         top={0}
+        bg="white"
+        zIndex={20}
       >
-        <Heading>Fagram</Heading>
-        <Button colorScheme="red" borderRadius="full">
+        <Heading>Instac</Heading>
+        <Button borderRadius="full">
           <Github />
           Github
         </Button>
       </Flex>
       <Container>
         <VStack gap={4} w="100%" pt={20} mb={8}>
-          <Heading className="sora-600" size="5xl">
-            Instagram Downloader
+          <Heading
+            className="sora-600"
+            size={{ base: "5xl", lg: "6xl" }}
+            textAlign="center"
+          >
+            <Highlight query="Instagram" styles={{ color: "pink.600" }}>
+              Instagram Downloader
+            </Highlight>
           </Heading>
-          <Text w="50%" textAlign="center">
+          <Text w={{ base: "80%", lg: "35%" }} textAlign="center">
             We all know that feeling: seeing the perfect tutorial, a hilarious
             Reel, or a stunning photo... and then losing it forever in your
             saved list
@@ -46,54 +91,54 @@ function App() {
             startElement={<Link2 />}
             endElement={
               <Button
-                colorPalette="pink.600"
+                colorPalette="pink"
                 variant="solid"
                 borderRadius="full"
+                size="xl"
+                onClick={handleSubmit}
+                disabled={isPending}
               >
                 <Download />
-                Download
+                <Text display={{ base: "none", lg: "block" }} opacity={1}>
+                  Download
+                </Text>
               </Button>
             }
             pr={1}
+            my={8}
           >
             <Input
               placeholder="https://instagram.com/p/G453HGDH/"
-              size="xl"
+              size="2xl"
               type="url"
               borderRadius="full"
+              shadow="md"
+              variant="outline"
+              onChange={handleChange}
             />
           </InputGroup>
         </VStack>
-        <Flex gap={4} mb={8}>
-          <Card.Root maxW="sm" overflow="hidden">
-            <Image
-              src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-              alt="Green double couch with wooden legs"
-              mb={2}
-            />
-            <Card.Footer gap="2">
-              <Button variant="solid" w="100%" borderRadius="full">
-                <Download />
-                Download
-              </Button>
-            </Card.Footer>
-          </Card.Root>
-        </Flex>
 
-        <Flex
-          w="100%"
-          gap={4}
-          direction="column"
-          justify="start"
-          alignItems="start"
-        >
+        <Flex w="100%" gap={4} direction="column" justify="start">
           <Heading>History</Heading>
-          <HStack justify="end">
-            <InputGroup startElement={<Search />}>
-              <Input placeholder="Search username, link..." />
-            </InputGroup>
-          </HStack>
-          <Table />
+          <Tabs.Root defaultValue="links">
+            <Tabs.List>
+              <Tabs.Trigger value="links">
+                <ListChevronsDownUp />
+                List
+              </Tabs.Trigger>
+              <Tabs.Trigger value="galleries">
+                <GalleryThumbnails />
+                Media
+              </Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content value="links" w="100%">
+              <Links />
+            </Tabs.Content>
+            <Tabs.Content value="galleries">
+              <Gallery />
+            </Tabs.Content>
+          </Tabs.Root>
         </Flex>
       </Container>
     </Box>
