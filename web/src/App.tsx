@@ -115,6 +115,7 @@ function App() {
               shadow="md"
               variant="outline"
               onChange={handleChange}
+              disabled={isPending}
             />
           </InputGroup>
         </VStack>

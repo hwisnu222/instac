@@ -9,7 +9,7 @@ import instaloader
 from pydantic import BaseModel, FilePath
 from fastapi.middleware.cors import CORSMiddleware
 from urllib.parse import urljoin
-from utils import Util
+from .utils import Util
 import mimetypes
 
 origins = [

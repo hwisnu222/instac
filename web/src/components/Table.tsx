@@ -50,19 +50,19 @@ export default function Table() {
 const items = [
   {
     id: 1,
-    username: "Laptop",
+    username: "user_1",
     link: "https://instagram.com/p/safsa323KJ",
     status: "done",
   },
   {
     id: 1,
-    username: "Laptop",
+    username: "user_2",
     link: "https://instagram.com/p/safsa323KJ",
     status: "done",
   },
   {
     id: 1,
-    username: "Laptop",
+    username: "user_3",
     link: "https://instagram.com/p/safsa323KJ",
     status: "done",
   },

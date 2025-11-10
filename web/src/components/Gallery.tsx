@@ -1,5 +1,14 @@
 import { swrFetcher } from "@/utils/swrFether";
-import { Button, Image, Box, SimpleGrid, Card } from "@chakra-ui/react";
+import {
+  Button,
+  Image,
+  Box,
+  SimpleGrid,
+  Card,
+  IconButton,
+  Link,
+} from "@chakra-ui/react";
+import { DeleteIcon } from "lucide-react";
 import useSWR from "swr";
 
 type MediaItem = {
@@ -13,9 +22,9 @@ export default function Gallery() {
 
   return (
     <Box mb={8}>
-      <SimpleGrid columns={{ base: 2, lg: 5 }} gap={4}>
+      <SimpleGrid columns={{ base: 2, lg: 5 }} gap={{ base: 2, lg: 2 }}>
         {data?.results?.map((item: MediaItem, idx: number) => (
-          <Card.Root key={idx} overflow="hidden">
+          <Card.Root key={idx}>
             {item.url.includes(".jpg") ? (
               <Image
                 src={item.url}
@@ -41,18 +50,25 @@ export default function Gallery() {
                 </video>
               </Box>
             )}
-
-            <Card.Footer p={2}>
-              <Button
-                variant="solid"
-                colorScheme="pink"
-                w="100%"
+            <Card.Footer p={{ base: 1, lg: 2 }}>
+              <IconButton
                 borderRadius="full"
-                size="md"
+                variant="surface"
+                colorPalette="red"
               >
-                {/* <Download /> */} {/* Komponen Ikon */}
-                Download
-              </Button>
+                <DeleteIcon />
+              </IconButton>
+              <Link href={item.url}>
+                <Button
+                  variant="solid"
+                  colorScheme="pink"
+                  borderRadius="full"
+                  size="md"
+                  flex={1}
+                >
+                  Download
+                </Button>
+              </Link>
             </Card.Footer>
           </Card.Root>
         ))}
