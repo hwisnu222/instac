@@ -21,6 +21,6 @@ COPY server/ ./
 
 COPY --from=build-react /app/dist ./static
 
-EXPOSE 80
+EXPOSE 8000
 
-CMD ["fastapi", "run", "main.py"]
+CMD ["uvicorn", "main:app"]

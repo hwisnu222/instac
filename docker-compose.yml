@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: fagram
     ports:
-      - "8080:80"
+      - "8080:8000"
     restart: unless-stopped
     volumes:
       - ./data/downloads:/app/backend/downloads
