@@ -40,6 +40,7 @@ function App() {
           url,
         });
         console.log(res);
+        setUrl("");
         toaster.create({
           description: "Post saved successfully",
           type: "success",
@@ -62,8 +63,9 @@ function App() {
         alignItems="center"
         position="sticky"
         top={0}
-        bg="white"
+        bg="whiteAlpha.200"
         zIndex={20}
+        backdropFilter="blur(30px)"
       >
         <Heading>Instac</Heading>
         <Button borderRadius="full">
@@ -72,7 +74,7 @@ function App() {
         </Button>
       </Flex>
       <Container>
-        <VStack gap={4} w="100%" pt={20} mb={8}>
+        <VStack gap={4} w="100%" mt={20} mb={8}>
           <Heading
             className="sora-600"
             size={{ base: "5xl", lg: "6xl" }}
@@ -116,6 +118,7 @@ function App() {
               variant="outline"
               onChange={handleChange}
               disabled={isPending}
+              value={url}
             />
           </InputGroup>
         </VStack>

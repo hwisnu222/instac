@@ -58,7 +58,7 @@ export default function Gallery() {
               >
                 <DeleteIcon />
               </IconButton>
-              <Link href={item.url}>
+              <Link href={item.url} w="100%">
                 <Button
                   variant="solid"
                   colorScheme="pink"

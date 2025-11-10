@@ -7,7 +7,7 @@ import { Toaster } from "./components/ui/toaster.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Provider>
+    <Provider forcedTheme="dark">
       <App />
       <Toaster />
     </Provider>

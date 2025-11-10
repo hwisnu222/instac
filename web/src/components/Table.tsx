@@ -1,4 +1,9 @@
-import { Table as ChakraTable, IconButton, HStack } from "@chakra-ui/react";
+import {
+  Table as ChakraTable,
+  IconButton,
+  HStack,
+  Badge,
+} from "@chakra-ui/react";
 import { Delete, View } from "lucide-react";
 
 export default function Table() {
@@ -27,7 +32,9 @@ export default function Table() {
             <ChakraTable.Row key={item.id}>
               <ChakraTable.Cell>{item.username}</ChakraTable.Cell>
               <ChakraTable.Cell>{item.link}</ChakraTable.Cell>
-              <ChakraTable.Cell>{item.status}</ChakraTable.Cell>
+              <ChakraTable.Cell>
+                <Badge colorPalette="pink">{item.status}</Badge>{" "}
+              </ChakraTable.Cell>
               <ChakraTable.Cell textAlign="end">
                 <HStack gap={2} justify="end">
                   <IconButton variant="outline" borderRadius="full">
