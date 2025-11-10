@@ -1,4 +1,4 @@
-import { HStack, Box, InputGroup, Input, VStack, Flex } from "@chakra-ui/react";
+import { HStack, InputGroup, Input, Flex } from "@chakra-ui/react";
 import Table from "./Table";
 import { Search } from "lucide-react";
 

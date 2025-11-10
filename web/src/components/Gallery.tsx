@@ -1,12 +1,5 @@
 import { swrFetcher } from "@/utils/swrFether";
-import {
-  Button,
-  Image,
-  Box,
-  SimpleGrid,
-  Card,
-  DownloadTrigger,
-} from "@chakra-ui/react";
+import { Button, Image, Box, SimpleGrid, Card } from "@chakra-ui/react";
 import useSWR from "swr";
 
 type MediaItem = {

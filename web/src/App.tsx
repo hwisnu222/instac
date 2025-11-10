@@ -19,7 +19,7 @@ import {
   ListChevronsDownUp,
   GalleryThumbnails,
 } from "lucide-react";
-import Links from "./components/Links";
+import Link from "./components/Link";
 import Gallery from "./components/Gallery";
 import { useState, useTransition, type ChangeEvent } from "react";
 import { API_BASE } from "./config/api";
@@ -133,7 +133,7 @@ function App() {
               </Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content value="links" w="100%">
-              <Links />
+              <Link />
             </Tabs.Content>
             <Tabs.Content value="galleries">
               <Gallery />
