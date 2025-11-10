@@ -6,9 +6,8 @@ from fastapi.staticfiles import StaticFiles
 import os
 from pathlib import Path
 import instaloader
-from pydantic import BaseModel, FilePath
+from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from urllib.parse import urljoin
 from .utils import Util
 import mimetypes
 
@@ -71,7 +70,9 @@ def download(item: DownloadItem):
 
     # download_path = []
     try:
-        shortcode = post_url.strip("/").split("/")[-1]
+
+        shortcode = post_url.split("/")[-2]
+
         post = instaloader.Post.from_shortcode(L.context, shortcode)
 
         # get filename

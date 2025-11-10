@@ -2,15 +2,13 @@ version: "3.8"
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: fagram
+    image: ghcr.io/hwisnu222/instac:main
+    container_name: instac
     ports:
-      - "8080:8000"
+      - "8083:8000"
     restart: unless-stopped
     volumes:
-      - ./data/downloads:/app/backend/downloads
+      - ./instac/downloads:/app/server/downloads
     environment:
       - PYTHONUNBUFFERED=1
       - FASTAPI_ENV=production
