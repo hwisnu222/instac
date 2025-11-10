@@ -19,7 +19,7 @@ RUN pip install -r requirements.txt
 
 COPY server/ ./
 
-COPY --from=build-react /app/build ./static
+COPY --from=build-react /app/web/build ./static
 
 EXPOSE 80
 
