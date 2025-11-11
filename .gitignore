@@ -2,5 +2,5 @@ __pycache__/
 *.pyc
 static/
 downloads/
-
+instac_db.db
 node_modules

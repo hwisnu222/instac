@@ -24,6 +24,7 @@ import Gallery from "./components/Gallery";
 import { useState, useTransition, type ChangeEvent } from "react";
 import { API_BASE } from "./config/api";
 import { toaster } from "./components/ui/toaster";
+import { mutate } from "swr";
 
 function App() {
   const [isPending, startTransition] = useTransition();
@@ -41,6 +42,9 @@ function App() {
         });
         console.log(res);
         setUrl("");
+        mutate("/download");
+        mutate("/download/media");
+
         toaster.create({
           description: "Post saved successfully",
           type: "success",
@@ -56,7 +60,17 @@ function App() {
   };
 
   return (
-    <Box pb={8}>
+    <Box pb={8} position="relative">
+      {/* <Box */}
+      {/*   position="absolute" */}
+      {/*   top={0} */}
+      {/*   left={0} */}
+      {/*   bg="pink.700" */}
+      {/*   h="90vh" */}
+      {/*   w="200vw" */}
+      {/*   backdropFilter="blur(10px)" */}
+      {/*   transform="rotate(25deg)" */}
+      {/* ></Box> */}
       <Flex
         justify="space-between"
         p={4}

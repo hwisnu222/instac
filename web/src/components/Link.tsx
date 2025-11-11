@@ -1,8 +1,12 @@
-import { HStack, InputGroup, Input, Flex } from "@chakra-ui/react";
+import { HStack, InputGroup, Input, Flex, Spinner } from "@chakra-ui/react";
 import Table from "./Table";
 import { Search } from "lucide-react";
+import { swrFetcher } from "@/utils/swrFether";
+import useSWR from "swr";
 
 export default function Links() {
+  const { data, isLoading } = useSWR("/download", swrFetcher);
+
   return (
     <Flex justify="start" alignItems="start" direction="column" gap={2}>
       <HStack justify="end">
@@ -14,7 +18,12 @@ export default function Links() {
           />
         </InputGroup>
       </HStack>
-      <Table />
+      {isLoading && (
+        <HStack gap="5">
+          <Spinner size="md" />
+        </HStack>
+      )}
+      <Table items={data?.results} />
     </Flex>
   );
 }

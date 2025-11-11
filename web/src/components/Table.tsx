@@ -3,10 +3,18 @@ import {
   IconButton,
   HStack,
   Badge,
+  Link,
 } from "@chakra-ui/react";
 import { Delete, View } from "lucide-react";
 
-export default function Table() {
+type TableProps = {
+  id: number;
+  url: string;
+  status: string;
+  username: string;
+};
+
+export default function Table({ items }: { items: TableProps[] }) {
   return (
     <ChakraTable.ScrollArea
       borderWidth="1px"
@@ -28,10 +36,10 @@ export default function Table() {
         </ChakraTable.Header>
 
         <ChakraTable.Body>
-          {items.map((item) => (
+          {items?.map((item) => (
             <ChakraTable.Row key={item.id}>
               <ChakraTable.Cell>{item.username}</ChakraTable.Cell>
-              <ChakraTable.Cell>{item.link}</ChakraTable.Cell>
+              <ChakraTable.Cell>{item.url}</ChakraTable.Cell>
               <ChakraTable.Cell>
                 <Badge colorPalette="pink">{item.status}</Badge>{" "}
               </ChakraTable.Cell>
@@ -41,9 +49,11 @@ export default function Table() {
                     <Delete />
                   </IconButton>
 
-                  <IconButton borderRadius="full">
-                    <View />
-                  </IconButton>
+                  <Link href={item.url} target="_blank">
+                    <IconButton borderRadius="full">
+                      <View />
+                    </IconButton>
+                  </Link>
                 </HStack>
               </ChakraTable.Cell>
             </ChakraTable.Row>
@@ -53,24 +63,3 @@ export default function Table() {
     </ChakraTable.ScrollArea>
   );
 }
-
-const items = [
-  {
-    id: 1,
-    username: "user_1",
-    link: "https://instagram.com/p/safsa323KJ",
-    status: "done",
-  },
-  {
-    id: 1,
-    username: "user_2",
-    link: "https://instagram.com/p/safsa323KJ",
-    status: "done",
-  },
-  {
-    id: 1,
-    username: "user_3",
-    link: "https://instagram.com/p/safsa323KJ",
-    status: "done",
-  },
-];
