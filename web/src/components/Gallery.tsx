@@ -18,6 +18,7 @@ import { DeleteIcon } from "lucide-react";
 import { useTransition } from "react";
 import useSWR, { mutate } from "swr";
 import { toaster } from "./ui/toaster";
+import { PhotoView } from "react-photo-view";
 
 type MediaItem = {
   id: number;
@@ -60,14 +61,17 @@ export default function Gallery() {
         {data?.results?.map((item: MediaItem, idx: number) => (
           <Card.Root key={idx}>
             {item.url.includes(".jpg") ? (
-              <Image
-                src={item.url}
-                alt="Media thumbnail"
-                mb={2}
-                width="100%"
-                height="200px"
-                objectFit="cover"
-              />
+              <PhotoView src={item.url}>
+                <Image
+                  src={item.url}
+                  alt="Media thumbnail"
+                  mb={2}
+                  width="100%"
+                  height="200px"
+                  objectFit="cover"
+                  cursor="pointer"
+                />
+              </PhotoView>
             ) : (
               <Box mb={2} width="100%" height="200px">
                 <video
