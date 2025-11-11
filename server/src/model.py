@@ -2,6 +2,7 @@ import enum
 from pathlib import Path
 from sqlmodel import Field, SQLModel, create_engine
 from typing import Optional
+from datetime import datetime
 
 # move sqlite file from root to db directory
 BASE_DIR = Path(__file__).resolve().parent
@@ -22,6 +23,9 @@ class StatusDownload(str, enum.Enum):
 class Media(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     path: str
+    created_at: Optional[datetime] = Field(
+        default_factory=datetime.utcnow, nullable=False
+    )
 
 
 class InstaUrl(SQLModel, table=True):
@@ -29,3 +33,6 @@ class InstaUrl(SQLModel, table=True):
     url: Optional[str] = Field(default=None, nullable=True)
     status: StatusDownload = Field(default=StatusDownload.DONE)
     username: Optional[str] = Field(default=None, nullable=True)
+    created_at: Optional[datetime] = Field(
+        default_factory=datetime.utcnow, nullable=False
+    )

@@ -19,7 +19,7 @@ export default function Links() {
         </InputGroup>
       </HStack>
       {isLoading && (
-        <HStack gap="5">
+        <HStack gap="5" justify="center">
           <Spinner size="md" />
         </HStack>
       )}

@@ -8,7 +8,7 @@ from pathlib import Path
 import instaloader
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import SQLModel, Session, String, or_, select
+from sqlmodel import SQLModel, Session, String, desc, or_, select
 from .utils import Util
 from .model import InstaUrl, Media, StatusDownload, engine
 import mimetypes
@@ -71,7 +71,7 @@ def downloads(request: Request, session: Session = Depends(get_session)):
         session.commit()
 
     util = Util()
-    new_media = session.exec(select(Media)).all()
+    new_media = session.exec(select(Media).order_by(desc(Media.created_at))).all()
 
     links = []
     for link in new_media:
@@ -127,7 +127,9 @@ def get_download(
 ):
     search_pattern = f"%{q}%"
     try:
-        download = session.exec(select(InstaUrl)).all()
+        download = session.exec(
+            select(InstaUrl).order_by(desc(InstaUrl.created_at))
+        ).all()
         return {"message": "success get all url", "results": download}
     except Exception as err:
         print(err)
