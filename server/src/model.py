@@ -1,9 +1,16 @@
 import enum
+from pathlib import Path
 from sqlmodel import Field, SQLModel, create_engine
 from typing import Optional
 
+# move sqlite file from root to db directory
+BASE_DIR = Path(__file__).resolve().parent
+DB_DIR = BASE_DIR / "database"
+DB_DIR.mkdir(exist_ok=True)
+DB_PATH = DB_DIR / "instac_db.db"
+
 # create engine for connect to database
-engine = create_engine("sqlite:///instac_db.db", echo=True)
+engine = create_engine(f"sqlite:///{DB_PATH}", echo=True)
 
 
 # enum
