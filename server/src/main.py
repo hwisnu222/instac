@@ -1,5 +1,5 @@
-from re import fullmatch
-from fastapi import Depends, FastAPI, Request, status, HTTPException
+from typing import Optional, cast
+from fastapi import Depends, FastAPI, Query, Request, status, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.exceptions import HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -8,7 +8,7 @@ from pathlib import Path
 import instaloader
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import SQLModel, Session, select
+from sqlmodel import SQLModel, Session, String, or_, select
 from .utils import Util
 from .model import InstaUrl, Media, StatusDownload, engine
 import mimetypes
@@ -70,37 +70,81 @@ def downloads(request: Request, session: Session = Depends(get_session)):
         session.add_all(new_records)
         session.commit()
 
-    print(new_path)
-    print(media)
-
     util = Util()
+    new_media = session.exec(select(Media)).all()
 
     links = []
-    for link in media:
+    for link in new_media:
         full_host = util.get_download_path(request)
-        filename = os.path.basename(link)
-        mimetype = mimetypes.guess_type(filename)[0]
+        filename = os.path.basename(link.path)
 
         links.append(
-            {"url": f"{full_host}/{link}", "filename": filename, "mimetype": mimetype}
+            {"id": link.id, "url": f"{full_host}/{link.path}", "filename": filename}
         )
 
     return {"message": "success get media", "results": links}
 
 
+@app.delete("/api/download/media/{id}")
+def delete(id: int, session: Session = Depends(get_session)):
+    try:
+        item_delete = session.exec(select(Media).where(Media.id == id)).first()
+        print(item_delete)
+
+        if not item_delete:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="item is not found"
+            )
+
+        file_path = os.path.join(DOWNLOAD_PATH, item_delete.path)
+        if Path(file_path).is_file():
+            try:
+
+                os.remove(file_path)
+            except OSError as e:
+                print(e)
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="failed delete file",
+                )
+
+        session.delete(item_delete)
+        session.commit()
+
+    except Exception as e:
+        print(e)
+        session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="internal server error",
+        )
+
+
 @app.get("/api/download")
-def get_download(session: Session = Depends(get_session)):
+def get_download(
+    q: Optional[str] = Query(None, description="search"),
+    session: Session = Depends(get_session),
+):
+    search_pattern = f"%{q}%"
     try:
         download = session.exec(select(InstaUrl)).all()
         return {"message": "success get all url", "results": download}
     except Exception as err:
         print(err)
-        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="failed get url download",
+        )
 
 
 @app.post("/api/download")
 def download(item: DownloadItem, session: Session = Depends(get_session)):
     post_url = item.url
+
+    if "instagram.com" not in item.url:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="please insert correct url"
+        )
 
     L = instaloader.Instaloader(
         dirname_pattern="downloads",
@@ -156,15 +200,34 @@ def download(item: DownloadItem, session: Session = Depends(get_session)):
         session.commit()
 
         print(f"Terjadi kesalahan umum: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="failed download post",
+        )
 
 
-@app.delete("/api/download")
-def delete(path: str):
-    print(path)
-    return "delete media"
+@app.delete("/api/download/{id}")
+def delete_list_download(id: int, session: Session = Depends(get_session)):
+    print(id)
+    try:
+        item_delete = session.exec(select(InstaUrl).where(InstaUrl.id == id)).first()
+
+        if not item_delete:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="url is not found"
+            )
+
+        session.delete(item_delete)
+        session.commit()
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="internal server error",
+        )
 
 
+# handle redirect route react
 @app.get("/{path:path}")
 async def frontend_handler(path: str):
     fp = Path("static") / path

@@ -34,29 +34,28 @@ function App() {
     setUrl(e.target.value);
   };
 
-  const handleSubmit = () => {
-    try {
-      startTransition(async () => {
-        const res = await API_BASE.post("/download", {
+  const handleSubmit = async () => {
+    startTransition(async () => {
+      try {
+        await API_BASE.post("/download", {
           url,
         });
-        console.log(res);
+
         setUrl("");
         mutate("/download");
         mutate("/download/media");
-
         toaster.create({
           description: "Post saved successfully",
           type: "success",
         });
-      });
-    } catch (error) {
-      console.log(error);
-      toaster.create({
-        description: "Failed save post",
-        type: "error",
-      });
-    }
+      } catch (error) {
+        console.log(error);
+        toaster.create({
+          description: "failed download post",
+          type: "error",
+        });
+      }
+    });
   };
 
   return (
