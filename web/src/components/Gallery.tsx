@@ -70,6 +70,7 @@ export default function Gallery() {
                   height="200px"
                   objectFit="cover"
                   cursor="pointer"
+                  loading="lazy"
                 />
               </PhotoView>
             ) : (

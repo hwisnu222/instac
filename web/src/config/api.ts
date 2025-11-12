@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const BASE_URL =
-  import.meta.env.NODE_ENV === "development"
+  import.meta.env.VITE_MODE === "development"
     ? "http://localhost:8000/api"
     : "/api";
 
