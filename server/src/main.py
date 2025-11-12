@@ -8,7 +8,7 @@ from pathlib import Path
 import instaloader
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import SQLModel, Session, String, desc, or_, select
+from sqlmodel import SQLModel, Session, String, col, desc, or_, select
 from .utils import Util
 from .model import InstaUrl, Media, StatusDownload, engine
 import mimetypes
@@ -125,11 +125,20 @@ def get_download(
     q: Optional[str] = Query(None, description="search"),
     session: Session = Depends(get_session),
 ):
-    search_pattern = f"%{q}%"
+    print(q)
+    statement = select(InstaUrl)
+
+    if q:
+        statement = statement.where(
+            or_(
+                col(InstaUrl.url).contains(q),
+                col(InstaUrl.username).contains(q),
+            )
+        )
+
     try:
-        download = session.exec(
-            select(InstaUrl).order_by(desc(InstaUrl.created_at))
-        ).all()
+        download = session.exec(statement.order_by(desc(InstaUrl.created_at))).all()
+
         return {"message": "success get all url", "results": download}
     except Exception as err:
         print(err)
@@ -158,15 +167,14 @@ def download(item: DownloadItem, session: Session = Depends(get_session)):
         download_video_thumbnails=False,
     )
 
-    download_url = InstaUrl(url=item.url)
+    shortcode = post_url.split("/")[-2]
+
+    post = instaloader.Post.from_shortcode(L.context, shortcode)
+
+    download_url = InstaUrl(url=item.url, username=post.owner_username)
 
     # download_path = []
     try:
-
-        shortcode = post_url.split("/")[-2]
-
-        post = instaloader.Post.from_shortcode(L.context, shortcode)
-
         # get filename
         # if post.typename == "GraphSidecar":
         #     for sidecar_node in post.get_sidecar_nodes():
@@ -188,7 +196,6 @@ def download(item: DownloadItem, session: Session = Depends(get_session)):
         L.download_post(post, "./")
 
         download_url.status = StatusDownload.DONE
-        download_url.username = post.owner_username
         session.add(download_url)
         session.commit()
 

@@ -30,9 +30,9 @@ class Media(SQLModel, table=True):
 
 class InstaUrl(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    url: Optional[str] = Field(default=None, nullable=True)
+    url: str = Field(index=True)
     status: StatusDownload = Field(default=StatusDownload.DONE)
-    username: Optional[str] = Field(default=None, nullable=True)
+    username: str = Field(index=True)
     created_at: Optional[datetime] = Field(
         default_factory=datetime.utcnow, nullable=False
     )
