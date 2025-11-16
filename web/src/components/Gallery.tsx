@@ -13,23 +13,38 @@ import {
   Dialog,
   Portal,
   CloseButton,
+  Pagination,
+  ButtonGroup,
 } from "@chakra-ui/react";
 import { DeleteIcon } from "lucide-react";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import useSWR, { mutate } from "swr";
 import { toaster } from "./ui/toaster";
 import { PhotoView } from "react-photo-view";
+import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
 type MediaItem = {
   id: number;
-  url: string;
-  mimetype: string;
-  filename: string;
+  path: string;
+};
+
+export type ChangePage = {
+  page: number;
+  pageSize: number;
 };
 
 export default function Gallery() {
   const [isPending, startTransition] = useTransition();
-  const { data, isLoading } = useSWR("/download/media", swrFetcher);
+  const [page, setPage] = useState(1);
+
+  const params = new URLSearchParams({
+    page: page.toString(),
+  });
+  const { data, isLoading } = useSWR(`/download/media?${params}`, swrFetcher);
+
+  const handleChangePage = (value: ChangePage) => {
+    setPage(value.page);
+  };
 
   const handleRemoveMedia = (id: number) => {
     startTransition(async () => {
@@ -58,12 +73,12 @@ export default function Gallery() {
         </HStack>
       )}
       <SimpleGrid columns={{ base: 2, lg: 5 }} gap={{ base: 2, lg: 2 }}>
-        {data?.results?.map((item: MediaItem, idx: number) => (
+        {data?.items?.map((item: MediaItem, idx: number) => (
           <Card.Root key={idx}>
-            {item.url.includes(".jpg") ? (
-              <PhotoView src={item.url}>
+            {item.path.includes(".jpg") ? (
+              <PhotoView src={item.path}>
                 <Image
-                  src={item.url}
+                  src={item.path}
                   alt="Media thumbnail"
                   mb={2}
                   width="100%"
@@ -77,7 +92,7 @@ export default function Gallery() {
               <Box mb={2} width="100%" height="200px">
                 <video
                   controls
-                  src={item.url}
+                  src={item.path}
                   preload="metadata"
                   style={{
                     width: "100%",
@@ -134,7 +149,7 @@ export default function Gallery() {
                 </Portal>
               </Dialog.Root>
 
-              <Link href={item.url} w="100%" target="_blank">
+              <Link href={item.path} w="100%" target="_blank">
                 <Button
                   variant="solid"
                   colorScheme="pink"
@@ -149,6 +164,39 @@ export default function Gallery() {
           </Card.Root>
         ))}
       </SimpleGrid>
+      <HStack justify="center" mt={8}>
+        <Pagination.Root
+          count={data?.total}
+          pageSize={data?.size}
+          defaultPage={1}
+          onPageChange={handleChangePage}
+        >
+          <ButtonGroup variant="outline" size="lg">
+            <Pagination.PrevTrigger asChild borderRadius="full">
+              <IconButton>
+                <LuChevronLeft />
+              </IconButton>
+            </Pagination.PrevTrigger>
+
+            <Pagination.Items
+              render={(page) => (
+                <IconButton
+                  variant={{ base: "outline", _selected: "solid" }}
+                  borderRadius="full"
+                >
+                  {page.value}
+                </IconButton>
+              )}
+            />
+
+            <Pagination.NextTrigger asChild borderRadius="full">
+              <IconButton>
+                <LuChevronRight />
+              </IconButton>
+            </Pagination.NextTrigger>
+          </ButtonGroup>
+        </Pagination.Root>
+      </HStack>
     </Box>
   );
 }

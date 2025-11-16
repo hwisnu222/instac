@@ -1,9 +1,20 @@
-import { HStack, InputGroup, Input, Flex, Spinner } from "@chakra-ui/react";
+import {
+  HStack,
+  InputGroup,
+  Input,
+  Flex,
+  Spinner,
+  Pagination,
+  ButtonGroup,
+  IconButton,
+} from "@chakra-ui/react";
 import Table from "./Table";
 import { Search } from "lucide-react";
 import { swrFetcher } from "@/utils/swrFether";
 import useSWR from "swr";
 import { useEffect, useState, type ChangeEvent } from "react";
+import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import type { ChangePage } from "./Gallery";
 
 function useDebounce(value: string, delay: number) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -24,11 +35,20 @@ function useDebounce(value: string, delay: number) {
 export default function Links() {
   const [search, setSearch] = useState("");
   const debouncedSearchTerm = useDebounce(search, 800);
+  const [page, setPage] = useState(1);
+
+  const params = new URLSearchParams({
+    page: page.toString(),
+  });
+
   const { data, isLoading } = useSWR(
-    `/download?q=${debouncedSearchTerm}`,
+    `/download?q=${debouncedSearchTerm}&${params}`,
     swrFetcher,
   );
 
+  const handleChangePage = (value: ChangePage) => {
+    setPage(value.page);
+  };
   const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
@@ -50,7 +70,40 @@ export default function Links() {
           <Spinner size="md" />
         </HStack>
       )}
-      <Table items={data?.results} />
+      <Table items={data?.items} />
+      <HStack justify="center" mt={8} w="100%">
+        <Pagination.Root
+          count={data?.total}
+          pageSize={data?.size}
+          defaultPage={1}
+          onPageChange={handleChangePage}
+        >
+          <ButtonGroup variant="outline" size="lg">
+            <Pagination.PrevTrigger asChild borderRadius="full">
+              <IconButton>
+                <LuChevronLeft />
+              </IconButton>
+            </Pagination.PrevTrigger>
+
+            <Pagination.Items
+              render={(page) => (
+                <IconButton
+                  variant={{ base: "outline", _selected: "solid" }}
+                  borderRadius="full"
+                >
+                  {page.value}
+                </IconButton>
+              )}
+            />
+
+            <Pagination.NextTrigger asChild borderRadius="full">
+              <IconButton>
+                <LuChevronRight />
+              </IconButton>
+            </Pagination.NextTrigger>
+          </ButtonGroup>
+        </Pagination.Root>
+      </HStack>
     </Flex>
   );
 }

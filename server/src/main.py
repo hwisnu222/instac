@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import Optional, TypeVar, cast
 from fastapi import Depends, FastAPI, Query, Request, status, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.exceptions import HTTPException
@@ -8,10 +8,12 @@ from pathlib import Path
 import instaloader
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import SQLModel, Session, String, col, desc, or_, select
+from sqlmodel import SQLModel, Session, col, desc, or_, select
 from .utils import Util
 from .model import InstaUrl, Media, StatusDownload, engine
-import mimetypes
+from fastapi_pagination import Page, add_pagination
+from fastapi_pagination.ext.sqlmodel import paginate
+from .config.config import get_session
 
 origins = [
     "http://localhost",
@@ -34,6 +36,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+add_pagination(app)
 
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 
@@ -44,14 +47,25 @@ def on_startup():
     SQLModel.metadata.create_all(engine)
 
 
-# function dependecy injection
-def get_session():
-    with Session(engine) as session:
-        yield session
+# custom page size pagination
+# from fastapi_pagination.customization import CustomizedPage, UseParamsFields
+#
+# T = TypeVar("T")
+#
+# CustomPage = CustomizedPage[
+#     Page[T],
+#     UseParamsFields(
+#         size=Query(2, ge=1, le=50),
+#     ),
+# ]
+#
 
 
-@app.get("/api/download/media")
-def downloads(request: Request, session: Session = Depends(get_session)):
+@app.get("/api/download/media", response_model=Page[Media])
+def downloads(
+    request: Request,
+    session: Session = Depends(get_session),
+):
     media = session.exec(select(Media.path)).all()
     print(media)
 
@@ -71,18 +85,18 @@ def downloads(request: Request, session: Session = Depends(get_session)):
         session.commit()
 
     util = Util()
-    new_media = session.exec(select(Media).order_by(desc(Media.created_at))).all()
+    statement = select(Media).order_by(desc(Media.created_at))
+    page = paginate(session, statement)
+    print(page.items)
 
-    links = []
-    for link in new_media:
+    for link in page.items:
         full_host = util.get_download_path(request)
         filename = os.path.basename(link.path)
 
-        links.append(
-            {"id": link.id, "url": f"{full_host}/{link.path}", "filename": filename}
-        )
+        link.path = f"{full_host}/{link.path}"
+        # link.filename = filename
 
-    return {"message": "success get media", "results": links}
+    return page
 
 
 @app.delete("/api/download/media/{id}")
@@ -120,7 +134,7 @@ def delete(id: int, session: Session = Depends(get_session)):
         )
 
 
-@app.get("/api/download")
+@app.get("/api/download", response_model=Page[InstaUrl])
 def get_download(
     q: Optional[str] = Query(None, description="search"),
     session: Session = Depends(get_session),
@@ -137,9 +151,9 @@ def get_download(
         )
 
     try:
-        download = session.exec(statement.order_by(desc(InstaUrl.created_at))).all()
+        statement = statement.order_by(desc(InstaUrl.created_at))
+        return paginate(session, statement)
 
-        return {"message": "success get all url", "results": download}
     except Exception as err:
         print(err)
         return HTTPException(
