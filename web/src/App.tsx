@@ -10,6 +10,7 @@ import {
   Box,
   Highlight,
   Tabs,
+  HStack,
 } from "@chakra-ui/react";
 import "./App.css";
 import {
@@ -18,6 +19,7 @@ import {
   Github,
   ListChevronsDownUp,
   GalleryThumbnails,
+  X,
 } from "lucide-react";
 import Link from "./components/Link";
 import Gallery from "./components/Gallery";
@@ -56,6 +58,10 @@ function App() {
         });
       }
     });
+  };
+
+  const handleClearUrl = () => {
+    setUrl("");
   };
 
   return (
@@ -105,19 +111,30 @@ function App() {
           <InputGroup
             startElement={<Link2 />}
             endElement={
-              <Button
-                colorPalette="pink"
-                variant="solid"
-                borderRadius="full"
-                size="xl"
-                onClick={handleSubmit}
-                disabled={isPending}
-              >
-                <Download />
-                <Text display={{ base: "none", lg: "block" }} opacity={1}>
-                  Download
-                </Text>
-              </Button>
+              <HStack>
+                <Button
+                  colorPalette="gray"
+                  variant="solid"
+                  borderRadius="full"
+                  size="sm"
+                  onClick={handleClearUrl}
+                >
+                  <X />
+                </Button>
+                <Button
+                  colorPalette="pink"
+                  variant="solid"
+                  borderRadius="full"
+                  size="xl"
+                  onClick={handleSubmit}
+                  disabled={isPending}
+                >
+                  <Download />
+                  <Text display={{ base: "none", lg: "block" }} opacity={1}>
+                    Download
+                  </Text>
+                </Button>
+              </HStack>
             }
             pr={1}
             my={8}
