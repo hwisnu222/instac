@@ -36,3 +36,12 @@ class InstaUrl(SQLModel, table=True):
     created_at: Optional[datetime] = Field(
         default_factory=datetime.utcnow, nullable=False
     )
+
+
+class User(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    username: str = Field(index=True, unique=True)
+    full_name: str | None = None
+    disabled: bool | None = Field(default=False)
+    # Field yang hanya ada di DB
+    hashed_password: str

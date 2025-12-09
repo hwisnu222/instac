@@ -1,8 +1,8 @@
-run:
-	uvicorn main:app
+dev:
+	uvicorn server.src.main:app --reload
 
 env:
 	source server/env/bin/activate
 
 freeze:
-	pip freeze -r requirements.txt
+	pip freeze > ./server/requirements.txt

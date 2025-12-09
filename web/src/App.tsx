@@ -11,6 +11,7 @@ import {
   Highlight,
   Tabs,
   HStack,
+  Spinner,
 } from "@chakra-ui/react";
 import "./App.css";
 import {
@@ -129,7 +130,7 @@ function App() {
                   onClick={handleSubmit}
                   disabled={isPending}
                 >
-                  <Download />
+                  {isPending ? <Spinner size="sm" /> : <Download />}
                   <Text display={{ base: "none", lg: "block" }} opacity={1}>
                     Download
                   </Text>
