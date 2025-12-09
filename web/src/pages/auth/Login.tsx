@@ -13,6 +13,7 @@ import useSWR from "swr";
 import { swrFetcher } from "@/utils/swrFether";
 import { useNavigate } from "react-router";
 import { toaster } from "@/components/ui/toaster";
+import { flushSync } from "react-dom";
 export default function Login() {
   const navigate = useNavigate();
 
@@ -28,7 +29,9 @@ export default function Login() {
 
     try {
       const res = await API_BASE.post("/auth/token", formData);
-      localStorage.setItem("@token", res.data.access_token);
+      flushSync(() => {
+        localStorage.setItem("@token", res.data.access_token);
+      });
       navigate("/");
     } catch (err) {
       toaster.error({
