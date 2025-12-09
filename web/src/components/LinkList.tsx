@@ -32,7 +32,7 @@ function useDebounce(value: string, delay: number) {
   return debouncedValue;
 }
 
-export default function Links() {
+export default function LinkList() {
   const [search, setSearch] = useState("");
   const debouncedSearchTerm = useDebounce(search, 800);
   const [page, setPage] = useState(1);

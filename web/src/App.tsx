@@ -12,6 +12,7 @@ import {
   Tabs,
   HStack,
   Spinner,
+  Link,
 } from "@chakra-ui/react";
 import "./App.css";
 import {
@@ -22,7 +23,7 @@ import {
   GalleryThumbnails,
   X,
 } from "lucide-react";
-import Link from "./components/Link";
+import LinkList from "./components/LinkList";
 import Gallery from "./components/Gallery";
 import { useState, useTransition, type ChangeEvent } from "react";
 import { API_BASE } from "./config/api";
@@ -88,10 +89,12 @@ function App() {
         backdropFilter="blur(30px)"
       >
         <Heading>Instac</Heading>
-        <Button borderRadius="full">
-          <Github />
-          Github
-        </Button>
+        <Link href="https://github.com/hwisnu222/instac">
+          <Button borderRadius="full">
+            <Github />
+            Github
+          </Button>
+        </Link>
       </Flex>
       <Container>
         <VStack gap={4} w="100%" mt={20} mb={8}>
@@ -168,7 +171,7 @@ function App() {
               </Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content value="links" w="100%">
-              <Link />
+              <LinkList />
             </Tabs.Content>
             <Tabs.Content value="galleries">
               <Gallery />
